@@ -1,0 +1,53 @@
+{
+  "projectType": "cli-tool",
+  "projectName": "Kahoot Answer Bot",
+  "projectDescription": "A Python CLI bot that automatically finds and submits correct answers to Kahoot quizzes, achieving a perfect score using any nickname.",
+  "theme": "mint",
+  "primaryColor": "#dedede",
+  "lightColor": "#fbde58",
+  "darkColor": null,
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": ["introduction", "installation", "quickstart"]
+          },
+          {
+            "group": "Usage",
+            "pages": ["usage/basic-usage", "usage/command-reference", "usage/authentication", "usage/search-mode"]
+          },
+          {
+            "group": "Reference",
+            "pages": ["reference/how-it-works", "reference/caveats", "reference/troubleshooting"]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Automatically fetches and submits correct Kahoot answers",
+    "Search quiz by name (requires login) or by UUID",
+    "2FA (Two-Factor Authentication) support",
+    "Debug mode for verbose output",
+    "Search-only mode to preview answers without joining a game",
+    "Supports quiz and multiple_select_quiz question types",
+    "WebSocket-based Kahoot client simulation via aiocometd"
+  ],
+  "publicApiSurface": [
+    "kbot -n <nick> -p <pin> -i <quizID>",
+    "kbot -n <nick> -p <pin> -q <quizName> -e <email> -a <password>",
+    "kbot -s -i <quizID>",
+    "kbot -s -q <quizName> -e <email> -a <password>",
+    "kbot -d (debug mode)",
+    "kbot -m <maxCount> (limit quiz search results)",
+    "Kahoot(pin, nickname, quizName, quizID, maxCount, DEBUG)",
+    "Kahoot.authenticate(email, password)",
+    "Kahoot.checkPin()",
+    "Kahoot.startGame()",
+    "Kahoot.search()",
+    "Kahoot.parseAnswers(quiz, debug)"
+  ]
+}
