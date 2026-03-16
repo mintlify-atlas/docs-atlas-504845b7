@@ -1,0 +1,89 @@
+---
+title: "Caveats"
+description: "Known limitations of Kahoot Answer Bot and what they mean in practice."
+---
+
+Kahoot Answer Bot works against Kahoot's internal APIs and real-time protocol. Several host-side settings and API constraints can cause it to behave incorrectly or fail.
+
+<AccordionGroup>
+  <Accordion title="Randomized answer order">
+    Kahoot hosts can enable **answer order randomization**, which shuffles the position of answer choices independently for each player.
+
+    The bot always fetches the canonical answer order from the API and submits the index of the correct answer in that fixed order. If the host has enabled randomization, the choices are displayed in a different order on the screen, and the index the bot submits will correspond to a different (likely wrong) answer for that player.
+
+    <Warning>
+      There is no way to detect or compensate for answer randomization. If the host enables it, the bot will consistently select wrong answers.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="Randomized question order">
+    Similarly, Kahoot supports **question order randomization**, which presents questions in a different sequence to different players.
+
+    The bot maps answer indices to question positions as they appear in the API response. If the question order is shuffled in the live game, the bot will submit the answer for the wrong question.
+
+    <Warning>
+      Randomized question order is not supported. The bot will answer incorrectly if the host enables this setting.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="Private quizzes">
+    Kahoot's REST API returns HTTP 400 for quizzes that are set to private and are not owned by the authenticated account.
+
+    When this happens, the bot exits with:
+
+    ```
+    Invalid UUID.
+    ```
+
+    You can only look up private quizzes if you are authenticated as the quiz owner. See the `-e` and `-a` flags.
+  </Accordion>
+
+  <Accordion title="Supported question types">
+    The bot only processes two question types:
+
+    - `quiz` — standard multiple choice
+    - `multiple_select_quiz` — select all that apply
+
+    All other question types (drag-and-drop, open-ended, word cloud, polls, etc.) are skipped during answer parsing. The placeholder `{'question': 'NOT A QUESTION'}` is inserted in the answers list.
+
+    When the bot reaches one of these unsupported questions in a live game, it submits `DEFAULT_ANSWER = 1`, which corresponds to the **BLUE** (second) answer choice.
+
+    <Note>
+      The fallback answer (BLUE) is always wrong for unsupported question types. This is expected behavior.
+    </Note>
+  </Accordion>
+
+  <Accordion title="Name-based search requires login">
+    Searching for a quiz by name (using the `-n` flag) calls Kahoot's search API, which requires an authenticated session.
+
+    You must provide both `-e` (email) and `-a` (password) when using `-n`. Without credentials, the bot will exit with:
+
+    ```
+    Authentication required when searching for quizzes by name
+    ```
+  </Accordion>
+
+  <Accordion title="Hardcoded captcha token">
+    The bot uses a hardcoded captcha token when logging into a game:
+
+    ```
+    KAHOOT_TOKEN_eyJ2ZXJzaW9uIjoiIn0=
+    ```
+
+    This token encodes a specific Kahoot code version (`eyJ2ZXJzaW9uIjoiIn0=` decodes to `{"version":""}`). If Kahoot rotates their version scheme or starts validating the token more strictly, the login step will fail and the bot will be unable to join games.
+
+    <Warning>
+      If the bot fails at login despite a valid pin and nickname, the captcha token may be outdated. Check for updates to the project.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="Python version">
+    The bot is specifically tested on **Python 3.9**. The async runtime behavior and certain dependency versions may differ on other Python versions.
+
+    Using a different Python version (3.10+, 3.8, etc.) is not officially supported and may result in unexpected errors, particularly around `asyncio` event loop management.
+
+    <Tip>
+      Use `python3.9` explicitly when running the bot to avoid compatibility issues.
+    </Tip>
+  </Accordion>
+</AccordionGroup>

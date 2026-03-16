@@ -1,0 +1,109 @@
+---
+title: "Search mode"
+description: "Preview quiz answers without joining a live game using the --search flag."
+---
+
+## What search mode is
+
+Search mode lets you look up the correct answers for a Kahoot quiz without joining any game. This is useful for reviewing answers ahead of time or verifying that kbot can find the right quiz.
+
+Enable it with the `-s` or `--search` flag. When this flag is set, `--pin` and `--nick` are ignored.
+
+## Search by quiz ID
+
+If you already have the quiz UUID, no account is required:
+
+```bash
+python kbot -s -i a1b2c3d4-e5f6-7890-abcd-ef1234567890
+```
+
+kbot fetches the quiz directly from:
+
+```
+https://create.kahoot.it/rest/kahoots/<uuid>
+```
+
+## Search by quiz name
+
+To search by name, you need to authenticate with your [create.kahoot.it](https://create.kahoot.it) account:
+
+```bash
+python kbot -s -q "World Capitals Quiz" -e user@example.com -a password
+```
+
+kbot queries the Kahoot search API and returns up to `--maxCount` results (default: 50).
+
+<Note>
+  Only quizzes of type `quiz` or `multiple_select_quiz` are processed. Other quiz types are skipped.
+</Note>
+
+## Limiting search results
+
+Use `-m` / `--maxCount` to control how many quizzes kbot fetches when searching by name. Reducing this number speeds up the search when there are many matches:
+
+```bash
+python kbot -s -q "Science" -e user@example.com -a password -m 10
+```
+
+The default is `50`.
+
+## Interactive confirmation
+
+When searching by name, kbot may find multiple matching quizzes. For each result, it prompts you to confirm before printing its answers:
+
+```
+Check 'World Capitals Quiz'? [y/N] 
+```
+
+Type `y` and press Enter to display the answers for that quiz. Press Enter (or type `n`) to skip it and move to the next result.
+
+## Output format
+
+For each confirmed quiz, kbot prints:
+
+```
+Title:   World Capitals Quiz
+Creator: example_user
+Desc:    Test your knowledge of world capitals.
+
+Question 1: What is the capital of France?
+Answer: Paris
+
+Question 2: What is the capital of Japan?
+Answer: Tokyo
+```
+
+Each question is listed with its correct answer.
+
+## When no quiz is found
+
+If no quiz matches the provided ID or name (for example, because the quiz is private or does not exist), kbot prints:
+
+```
+No quiz found. (private?)
+```
+
+If this happens with a UUID, verify the ID is correct and that the quiz is publicly accessible. If this happens with a name search, try authenticating with an account that has access to the quiz, or use `--quizID` if you know the exact UUID.
+
+## Examples
+
+<Tabs>
+  <Tab title="Search by ID">
+    ```bash
+    python kbot -s -i a1b2c3d4-e5f6-7890-abcd-ef1234567890
+    ```
+    No account needed. Fetches the quiz directly by UUID.
+  </Tab>
+  <Tab title="Search by name">
+    ```bash
+    python kbot -s -q "World Capitals" -e user@example.com -a password
+    ```
+    Requires authentication. Returns up to 50 matching quizzes by default.
+  </Tab>
+  <Tab title="Search by name with limit">
+    ```bash
+    python kbot -s -q "Science" -e user@example.com -a password -m 5
+    ```
+    Returns at most 5 results.
+  </Tab>
+</Tabs>

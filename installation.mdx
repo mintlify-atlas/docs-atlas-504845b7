@@ -1,0 +1,143 @@
+---
+title: "Installation"
+description: "Install Python 3.9 and the required dependencies on Windows, macOS, or Linux."
+---
+
+## Prerequisites
+
+Kahoot Answer Bot requires **Python 3.9**. Other Python versions are not guaranteed to work due to dependency constraints.
+
+## Steps
+
+<Steps>
+  <Step title="Install Python 3.9">
+    Follow the instructions for your operating system.
+
+    <Tabs>
+      <Tab title="Windows">
+        1. Go to the [Python 3.9 downloads page](https://www.python.org/downloads/release/python-3913/) and download the Windows installer.
+        2. Run the installer. Check **Add Python 3.9 to PATH** before clicking **Install Now**.
+        3. Verify the installation:
+
+        ```bash
+        python --version
+        ```
+
+        You should see `Python 3.9.x`.
+      </Tab>
+      <Tab title="macOS">
+        macOS 11 (Big Sur) and later do not ship with Python 3.9. Install it using [Homebrew](https://brew.sh):
+
+        ```bash
+        brew install python@3.9
+        ```
+
+        Then verify:
+
+        ```bash
+        python3.9 --version
+        ```
+
+        <Note>
+          If `brew` is not installed, run the following first:
+
+          ```bash
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          ```
+        </Note>
+      </Tab>
+      <Tab title="Debian / Ubuntu">
+        ```bash
+        sudo apt update
+        sudo apt install python3.9 python3.9-pip
+        ```
+
+        Verify:
+
+        ```bash
+        python3.9 --version
+        ```
+
+        <Note>
+          On older releases (e.g., Ubuntu 20.04), Python 3.9 may not be in the default repositories. Add the deadsnakes PPA first:
+
+          ```bash
+          sudo add-apt-repository ppa:deadsnakes/ppa
+          sudo apt update
+          sudo apt install python3.9 python3.9-pip
+          ```
+        </Note>
+      </Tab>
+      <Tab title="Arch Linux">
+        ```bash
+        sudo pacman -Sy python39
+        ```
+
+        Verify:
+
+        ```bash
+        python3.9 --version
+        ```
+      </Tab>
+      <Tab title="Other Linux">
+        Use your distribution's package manager to install Python 3.9, or build from source:
+
+        ```bash
+        wget https://www.python.org/ftp/python/3.9.13/Python-3.9.13.tgz
+        tar -xf Python-3.9.13.tgz
+        cd Python-3.9.13
+        ./configure --enable-optimizations
+        make -j$(nproc)
+        sudo make altinstall
+        ```
+
+        Using `altinstall` avoids replacing your system Python.
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Clone the repository">
+    Clone the Kahoot Answer Bot repository from GitHub:
+
+    ```bash
+    git clone https://github.com/Raymo111/kahoot-answer-bot.git
+    cd kahoot-answer-bot
+    ```
+
+    If you do not have `git`, you can download the repository as a ZIP from GitHub and extract it.
+  </Step>
+
+  <Step title="Install dependencies">
+    Install the required Python packages using the bundled `requirements.txt`:
+
+    ```bash
+    python3.9 -m pip install -r requirements.txt
+    ```
+
+    This installs the following packages:
+
+    | Package | Version |
+    |---|---|
+    | `requests` | >=2.20.0 |
+    | `aiocometd` | 0.4.5 |
+    | `py_mini_racer` | 0.6.0 |
+    | `colorama` | 0.4.6 |
+
+    <Warning>
+      Use `python3.9 -m pip` explicitly. If your system has multiple Python versions, running `pip` or `pip3` alone may install packages for the wrong version.
+    </Warning>
+  </Step>
+
+  <Step title="(Optional) Set up a Kahoot account">
+    A Kahoot account is only required if you want to search for quizzes by name using the `-q` flag. Playing by quiz ID works without an account.
+
+    To create an account:
+
+    1. Go to [create.kahoot.it](https://create.kahoot.it) and sign up.
+    2. Note your email and password — you will pass these to kbot with `-e` and `-a`.
+
+    <Tip>
+      If you only have the quiz UUID, you can skip this step entirely and jump straight to the [Quickstart](/quickstart).
+    </Tip>
+  </Step>
+</Steps>

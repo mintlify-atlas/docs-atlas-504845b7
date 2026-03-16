@@ -1,0 +1,85 @@
+---
+title: "Authentication"
+description: "When and how to authenticate with your Kahoot account, and the security implications of passing credentials on the command line."
+---
+
+## When authentication is needed
+
+Authentication is only required when you want to search for a quiz by name using `--quizName`. Looking up a quiz by its UUID (`--quizID`) does not require an account.
+
+<Columns cols={2}>
+  <Card title="No account needed" icon="lock-open">
+    Fetching answers by quiz ID (`--quizID`) makes a direct API call that does not require authentication.
+  </Card>
+  <Card title="Account required" icon="lock">
+    Searching by quiz name (`--quizName`) calls the Kahoot search API, which requires a valid logged-in session.
+  </Card>
+</Columns>
+
+## How to authenticate
+
+Pass your [create.kahoot.it](https://create.kahoot.it) credentials using the `-e` / `--email` and `-a` / `--password` flags:
+
+```bash
+python kbot -e user@example.com -a yourpassword [other options]
+```
+
+When authentication succeeds, kbot prints:
+
+```
+AUTHENTICATED
+```
+
+## What happens internally
+
+kbot sends a `POST` request to:
+
+```
+https://create.kahoot.it/rest/authenticate
+```
+
+With the following JSON body:
+
+```json
+{
+  "username": "user@example.com",
+  "password": "yourpassword",
+  "grant_type": "password"
+}
+```
+
+If the server returns HTTP `200`, kbot extracts the `access_token` from the response and attaches it to all subsequent API requests.
+
+## Error: invalid credentials
+
+If the server returns HTTP `401`, kbot prints an error and exits:
+
+```
+Invalid Email or Password.
+```
+
+Double-check your email address and password on [create.kahoot.it](https://create.kahoot.it) before retrying.
+
+## 2FA
+
+If your account has two-factor authentication enabled, kbot will pause after a successful password login and display a color-sequence prompt:
+
+```
+2fa (e.g. rbyg, yrgb) > 
+```
+
+Enter the color sequence shown on the 2FA screen using single-letter codes (`r` = RED, `b` = BLUE, `y` = YELLOW, `g` = GREEN), then press Enter.
+
+See [Basic usage — 2FA challenge](/usage/basic-usage#2fa-challenge) for the full color mapping table.
+
+## Security warning
+
+<Warning>
+  Your password is passed as a plain-text command-line argument. It will be visible in your shell history and in process listings (`ps aux`). Avoid using this on shared machines.
+</Warning>
+
+To reduce exposure:
+
+- Clear your shell history after use (`history -c` in bash, or delete the relevant entry).
+- Consider running kbot in a dedicated terminal session that you close immediately after use.
+- If your account is not needed, use `--quizID` instead — no credentials are required.

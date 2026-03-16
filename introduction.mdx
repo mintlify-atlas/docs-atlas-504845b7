@@ -1,0 +1,48 @@
+---
+title: "Introduction"
+description: "A Python CLI bot that automatically finds and submits correct Kahoot answers, achieving a perfect score with any nickname."
+---
+
+## What is Kahoot Answer Bot?
+
+Kahoot Answer Bot (`kbot`) is a command-line tool written in Python that automatically plays Kahoot quizzes for you. It connects to Kahoot's WebSocket API, looks up the correct answers for a given quiz, and submits them in real time — giving you a perfect score under any nickname you choose.
+
+The bot works by simulating a real Kahoot client. It joins a game session using a game PIN, fetches the quiz answer data directly from Kahoot's REST API, and responds to each question automatically as it appears.
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/installation">
+    Install Python 3.9 and the required dependencies on Windows, macOS, or Linux.
+  </Card>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Get kbot running and win your first Kahoot in minutes.
+  </Card>
+  <Card title="Command Reference" icon="terminal" href="/usage/command-reference">
+    Explore every flag and option available in the CLI.
+  </Card>
+  <Card title="How It Works" icon="gear" href="/reference/how-it-works">
+    Understand the WebSocket protocol and answer-lookup mechanism.
+  </Card>
+</CardGroup>
+
+## Key features
+
+- **Automatic answer lookup** — retrieves correct answers from Kahoot's API by quiz ID or name
+- **Search by name** — find quizzes without knowing their UUID (requires a Kahoot account)
+- **2FA support** — handles Kahoot's two-factor authentication challenge during gameplay
+- **Search-only mode** — preview answers for a quiz without joining a live game
+- **Debug mode** — verbose output for diagnosing connection or lookup issues
+- **Cross-platform** — runs on Windows, macOS, and Linux
+
+## Limitations
+
+Before using kbot, be aware of situations where it will not work correctly:
+
+<Warning>
+kbot does not work when **answer order is randomized**, **question order is randomized**, or the **quiz is private**. It relies on the original question and answer ordering from the API response, so any randomization will cause wrong answers to be submitted.
+</Warning>
+
+## Credits
+
+- [Raymo111](https://github.com/Raymo111) — restored broken functionality, added 2FA support and search-by-ID
+- [reteps](https://github.com/reteps/kbot) — original author and main programming
+- [idiidk](https://github.com/idiidk) — challenge decoding implementation

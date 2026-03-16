@@ -1,0 +1,145 @@
+---
+title: "Command reference"
+description: "Complete reference for every kbot flag and argument."
+---
+
+Run kbot from the project directory:
+
+```bash
+python kbot [options]
+```
+
+All flags are optional on the command line. When required values (such as pin or nickname) are not provided, kbot prompts for them interactively.
+
+---
+
+## Flags
+
+<ParamField path="-s" type="boolean">
+  **`--search`** — Enable search mode. Look up quiz answers without joining a live game. When set, `--nick` and `--pin` are ignored.
+
+  Requires either `--quizID` or `--quizName` (with authentication for name-based search).
+
+  ```bash
+  python kbot -s -i <uuid>
+  python kbot -s -q "Quiz Name" -e user@example.com -a password
+  ```
+</ParamField>
+
+<ParamField path="-d" type="boolean">
+  **`--debug`** — Enable verbose debug output. Prints raw WebSocket frames and internal state to stdout. Useful for diagnosing connection or answer-lookup problems.
+
+  ```bash
+  python kbot -p 123456 -n MyBot -d
+  ```
+</ParamField>
+
+<ParamField path="-e" type="string">
+  **`--email`** — Email address for your [create.kahoot.it](https://create.kahoot.it) account. Required when searching by quiz name (`--quizName`).
+
+  ```bash
+  python kbot -e user@example.com -a password -q "My Quiz" -s
+  ```
+</ParamField>
+
+<ParamField path="-a" type="string">
+  **`--password`** — Password for your [create.kahoot.it](https://create.kahoot.it) account. Used together with `--email`.
+
+  <Warning>Your password is passed as a plain-text argument and will be visible in your shell history. See [Authentication](/usage/authentication) for details.</Warning>
+
+  ```bash
+  python kbot -e user@example.com -a mypassword -q "My Quiz" -s
+  ```
+</ParamField>
+
+<ParamField path="-n" type="string">
+  **`--nick`** — Nickname to join the Kahoot game with. Ignored when `--search` is set. Prompted interactively if not provided.
+
+  ```bash
+  python kbot -p 123456 -n CoolBot
+  ```
+</ParamField>
+
+<ParamField path="-p" type="string">
+  **`--pin`** — Game pin shown on the Kahoot host's screen. Ignored when `--search` is set. Prompted interactively if not provided.
+
+  ```bash
+  python kbot -p 987654 -n MyBot
+  ```
+</ParamField>
+
+<ParamField path="-q" type="string">
+  **`--quizName`** — Name of the quiz to search for. Used to look up answer data by title rather than by ID. Requires authentication (`--email` and `--password`) because the Kahoot search API requires a logged-in session.
+
+  When multiple quizzes match the name, kbot prompts you to confirm each one interactively.
+
+  ```bash
+  python kbot -p 123456 -n Bot -q "World Capitals Quiz" -e user@example.com -a password
+  ```
+</ParamField>
+
+<ParamField path="-i" type="string">
+  **`--quizID`** — UUID of the specific quiz to fetch answers for. No authentication required. The UUID format is `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`.
+
+  ```bash
+  python kbot -p 123456 -n Bot -i a1b2c3d4-e5f6-7890-abcd-ef1234567890
+  ```
+</ParamField>
+
+<ParamField path="-m" type="integer" default="50">
+  **`--maxCount`** — Maximum number of quizzes to return when searching by name. Defaults to `50`. Has no effect when searching by ID.
+
+  ```bash
+  python kbot -s -q "Science Quiz" -e user@example.com -a password -m 10
+  ```
+</ParamField>
+
+---
+
+## Flag combinations
+
+### Play a game using a quiz ID (no account needed)
+
+```bash
+python kbot -p 123456 -n MyBot -i a1b2c3d4-e5f6-7890-abcd-ef1234567890
+```
+
+### Play a game using a quiz name (account required)
+
+```bash
+python kbot -p 123456 -n MyBot -q "World Capitals" -e user@example.com -a password
+```
+
+### Search for answers by quiz ID (no account needed)
+
+```bash
+python kbot -s -i a1b2c3d4-e5f6-7890-abcd-ef1234567890
+```
+
+### Search for answers by quiz name (account required)
+
+```bash
+python kbot -s -q "World Capitals" -e user@example.com -a password
+```
+
+### Limit search results and enable debug output
+
+```bash
+python kbot -s -q "Science" -e user@example.com -a password -m 5 -d
+```
+
+---
+
+## Flag summary table
+
+| Short | Long | Type | Auth required | Description |
+|-------|------|------|---------------|-------------|
+| `-s` | `--search` | flag | — | Search mode; skip joining a game |
+| `-d` | `--debug` | flag | — | Verbose debug output |
+| `-e` | `--email` | string | — | Kahoot account email |
+| `-a` | `--password` | string | — | Kahoot account password |
+| `-n` | `--nick` | string | No | Nickname for joining a game |
+| `-p` | `--pin` | string | No | Game pin |
+| `-q` | `--quizName` | string | Yes | Quiz name to search for |
+| `-i` | `--quizID` | string (UUID) | No | Quiz UUID to fetch directly |
+| `-m` | `--maxCount` | integer | — | Max results for name search (default: 50) |

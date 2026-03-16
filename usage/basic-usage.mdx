@@ -1,0 +1,114 @@
+---
+title: "Basic usage"
+description: "Learn how to run kbot, understand its two main modes, and what to expect during a live game."
+---
+
+## Running kbot
+
+Navigate to the directory where you cloned the repository, then run:
+
+```bash
+python kbot [options]
+```
+
+If you omit the `--pin` or `--nick` options, kbot will prompt you for them interactively before joining a game.
+
+## Two main modes
+
+<Columns cols={2}>
+  <Card title="Play mode" icon="play">
+    Join a live Kahoot game and automatically answer questions as they appear. Requires a game pin and a nickname.
+  </Card>
+  <Card title="Search mode" icon="magnifying-glass">
+    Look up answers for a quiz without joining any game. Enable with the `-s` / `--search` flag. See [Search mode](/usage/search-mode) for details.
+  </Card>
+</Columns>
+
+## Interactive prompts
+
+When you run kbot without specifying `--pin` or `--nick`, it prompts you at startup:
+
+```
+Enter game pin: 
+Enter nickname: 
+```
+
+You can also pass these values directly as flags to skip the prompts:
+
+```bash
+python kbot -p 123456 -n MyBot
+```
+
+## What happens during a game
+
+<Steps>
+  <Step title="Connect">
+    kbot connects to the Kahoot game server using the provided pin and nickname.
+  </Step>
+  <Step title="Look up answers">
+    kbot fetches the quiz answer data using the quiz name or ID. You will see `ANSWERS RECEIVED` in the output when this succeeds.
+  </Step>
+  <Step title="Wait for questions">
+    kbot listens for `START_QUESTION` events from the server. As each question arrives, it logs the question number.
+  </Step>
+  <Step title="Submit answer">
+    kbot selects the correct answer and logs which color was chosen, for example `SELECTED BLUE`. If no answer data is available for a question, it logs `SELECTED FALLBACK` and submits the default answer.
+  </Step>
+  <Step title="Game over">
+    When the host ends the game, kbot logs `Game over` and exits.
+  </Step>
+</Steps>
+
+## Answer color system
+
+Kahoot maps each answer position to a color. kbot uses the same mapping internally:
+
+| Position | Color  |
+|----------|--------|
+| 0        | RED    |
+| 1        | BLUE   |
+| 2        | YELLOW |
+| 3        | GREEN  |
+
+When kbot selects an answer, it logs the color name: `SELECTED RED`, `SELECTED BLUE`, `SELECTED YELLOW`, or `SELECTED GREEN`.
+
+## Output messages reference
+
+| Message | Meaning |
+|---------|---------|
+| `AUTHENTICATED` | Login to create.kahoot.it succeeded. |
+| `ANSWERS RECEIVED` | Quiz answer data fetched successfully. |
+| `SELECTED RED/BLUE/YELLOW/GREEN` | Answer submitted for the current question. |
+| `SELECTED FALLBACK` | No answer found; submitted default answer (position 1). |
+| `Game over` | The host ended the game. |
+
+## 2FA challenge
+
+If your Kahoot account has two-factor authentication enabled, kbot will pause after authenticating and display:
+
+```
+2fa (e.g. rbyg, yrgb) > 
+```
+
+Enter the color sequence shown on the 2FA screen using single-letter codes:
+
+| Letter | Color  |
+|--------|--------|
+| `r`    | RED    |
+| `b`    | BLUE   |
+| `y`    | YELLOW |
+| `g`    | GREEN  |
+
+**Example:** if the screen shows Red, Blue, Yellow, Green, type `rbyg` and press Enter.
+
+<Note>
+  2FA only appears when authenticating with `--email` and `--password`. Quiz ID lookups without authentication do not trigger 2FA.
+</Note>
+
+## Debug output
+
+Pass `-d` / `--debug` to enable verbose logging. This prints raw WebSocket messages and internal state, which is useful for diagnosing connection issues.
+
+```bash
+python kbot -p 123456 -n MyBot -d
+```

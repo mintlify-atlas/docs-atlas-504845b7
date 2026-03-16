@@ -1,0 +1,114 @@
+---
+title: "Troubleshooting"
+description: "Common errors and how to resolve them."
+---
+
+<AccordionGroup>
+  <Accordion title='"Pin XXXXX does not exist."'>
+    The session reservation endpoint returned a non-200 response for the given pin.
+
+    **Possible causes:**
+    - The pin is incorrect
+    - The game has not been started by the host yet
+    - The game has already ended
+    - The lobby has been closed to new participants
+
+    **Fix:** Verify the pin with the host and ensure the game is in the lobby phase (waiting for players) before running the bot.
+  </Accordion>
+
+  <Accordion title='"Invalid Email or Password."'>
+    The authentication request to Kahoot's API failed.
+
+    **Fix:** Double-check the credentials passed to `-e` (email) and `-a` (password). Ensure there are no extra spaces or shell escaping issues. Try logging in to kahoot.com in a browser to confirm the credentials are valid.
+  </Accordion>
+
+  <Accordion title='"Invalid UUID."'>
+    The quiz ID provided via `-q` is malformed, or the quiz is private and not accessible with the current credentials.
+
+    **Fix:**
+    - Confirm the quiz ID is a valid UUID (e.g. `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`)
+    - If the quiz is private, authenticate as the quiz owner using `-e` and `-a`
+    - See [Caveats — Private quizzes](/reference/caveats) for more detail
+  </Accordion>
+
+  <Accordion title='"No quiz found. (private?)"'>
+    A name-based search (`-n`) returned no results.
+
+    **Possible causes:**
+    - The quiz name does not match any public quizzes
+    - The quiz exists but is set to private
+    - The search API did not return a close enough match
+
+    **Fix:** Try using the exact quiz name. If the quiz is yours and set to private, pass the quiz ID directly with `-q` and authenticate with `-e` and `-a`.
+  </Accordion>
+
+  <Accordion title='"Authentication required when searching for quizzes by name"'>
+    The `-n` (name search) flag was used without providing login credentials.
+
+    **Fix:** Include both `-e <email>` and `-a <password>` when using the `-n` flag.
+
+    ```bash
+    python3.9 answer.py -p <pin> -n "Quiz name" -e you@example.com -a yourpassword
+    ```
+  </Accordion>
+
+  <Accordion title="ModuleNotFoundError">
+    A required Python package is not installed in the current environment.
+
+    **Fix:** Install all dependencies using the correct Python version:
+
+    ```bash
+    python3.9 -m pip install -r requirements.txt
+    ```
+
+    If you're using a virtual environment, make sure it is activated before running the install command.
+  </Accordion>
+
+  <Accordion title="asyncio.exceptions.CancelledError">
+    This appears when the bot's async event loop is interrupted.
+
+    In most cases this is a **normal exit** caused by pressing `Ctrl+C`. The game may also have ended, which closes the WebSocket connection and cancels the running coroutine.
+
+    This is not an error that requires a fix unless it appears unexpectedly during a game.
+  </Accordion>
+
+  <Accordion title="2FA prompt does not complete">
+    The bot submitted a two-factor authentication response but did not receive `TWO_FACTOR_AUTH_CORRECT`.
+
+    **Possible causes:**
+    - The color sequence was entered in the wrong order
+    - A typo in the input (invalid character)
+
+    **Fix:** When prompted, enter the colors exactly as shown on screen, left to right, using the single-character codes:
+
+    | Color | Code |
+    |---|---|
+    | Red | `r` |
+    | Blue | `b` |
+    | Yellow | `y` |
+    | Green | `g` |
+
+    Example input for a sequence of Red, Yellow, Blue, Green: `rybg`
+  </Accordion>
+
+  <Accordion title="Bot joins but selects wrong answers">
+    The bot connects and plays but consistently picks incorrect answers.
+
+    **Possible causes:**
+    - The host enabled **answer order randomization** — the bot submits the index from the API, which no longer matches the on-screen order
+    - The host enabled **question order randomization** — the bot answers questions out of sequence
+    - The quiz ID or name resolved to the wrong quiz
+
+    **Fix:** Confirm the correct quiz is being used. If the host has enabled randomization, the bot cannot function correctly — see [Caveats](/reference/caveats) for a full explanation.
+  </Accordion>
+
+  <Accordion title="Debugging raw API responses">
+    If you need to inspect what the bot is receiving from the API or the WebSocket, run with the `-d` flag:
+
+    ```bash
+    python3.9 answer.py -p <pin> -d
+    ```
+
+    Debug mode prints raw API responses and WebSocket message payloads to stdout, which can help identify unexpected data shapes or authentication failures.
+  </Accordion>
+</AccordionGroup>
